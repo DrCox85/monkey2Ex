@@ -1,0 +1,43 @@
+Namespace std.consoleinput
+
+#rem monkeydoc Input for Terminal/Console.
+
+Returns Input String.
+
+@param s Prompt String.
+@param maxLength MaxLength for Input.
+
+Thx to abakobo 
+
+https://github.com/abakobo/learn_monkey2/tree/master/console_input
+
+#end
+
+Function Input:String(prompt:String, maxLength:Int)
+	
+	Local char := New Byte[1]
+	Local input := New Byte[maxLength]
+	Local count:Int = 0
+	Local data:String = ""
+	
+	libc.fputs(prompt+" ", libc.stdout)
+	libc.fflush(libc.stdout)
+	
+	While(True)
+		If(String.FromChar(char[0]) <> "~n" And count < maxLength)
+			libc.fread(char.Data, 1, 1, libc.stdin)
+			input[count] = char[0]
+			count += 1
+		Else
+			input[count - 1] = 0
+			Exit
+		Endif
+	Wend
+	
+	For Local i := 0 Until count-1
+		data += String.FromChar(input[i])
+	Next
+	
+	Return data
+	
+End Function

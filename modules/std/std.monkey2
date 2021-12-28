@@ -90,6 +90,8 @@ Namespace std
 
 #Import "permissions/permissions"
 
+#Import "consoleinput/consoleInput"
+
 Private
 
 Function Main()
