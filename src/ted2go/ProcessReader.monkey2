@@ -166,6 +166,7 @@ Class ProcessReader
 			Local stdout:=process.ReadStdout()
 			
 			If stdout
+				Print stdout
 				stdout=stdout.Replace( "~r~n","~n" ).Replace( "~r","~n" )
 				_output+=stdout
 				PortionRead( stdout )

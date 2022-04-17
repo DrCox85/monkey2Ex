@@ -62,7 +62,7 @@ Class FlyBehaviour Extends Behaviour
 	
 		If Keyboard.KeyDown( Key.A )
 			entity.MoveZ( _speed * 60 * elapsed )
-		Else If Keyboard.KeyDown( Key.Z )
+		Else If Keyboard.KeyDown( Key.Z|Key.Raw )
 			entity.MoveZ( -_speed * 60 * elapsed )
 		Endif
 		

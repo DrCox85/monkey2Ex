@@ -5,28 +5,25 @@ Namespace mx2cc
 
 Function FindMSVC:Bool()
 
-	Local msvcs:=GetEnv( "ProgramFiles(x86)" )+"\Microsoft Visual Studio\2019"
+	'Local msvcs:=GetEnv( "ProgramFiles" )+"\Microsoft Visual Studio\2022"
+	Local msvcs:="D:\VisualStudio\VC\Tools\MSVC"
 	If GetFileType( msvcs )<>FileType.Directory Return False
 	
 	Local wkits:=GetEnv( "ProgramFiles(x86)" )+"\Windows Kits\10"
 	If GetFileType( wkits )<>FileType.Directory Return False
 	
-	Local toolsDir:="",maxver:=0
+	Local toolsDir:="",maxver:=""
 	
 	For Local f:=Eachin LoadDir( msvcs )
-	
-		Local dir:=msvcs+"\"+f+"\VC\Tools\MSVC"
-		If GetFileType( dir )<>FileType.Directory Continue
 		
-		For Local f:=Eachin LoadDir( dir )
-			Local verDir:=dir+"\"+f
-			If GetFileType( verDir )<>FileType.Directory Continue
-			Local ver:=Int( f.Replace( ".","" ) )
-			If ver>maxver
-				toolsDir=verDir
-				maxver=ver
-			Endif
-		Next
+		Local dir:=msvcs+"\"+f
+		
+		If GetFileType( dir )<>FileType.Directory Continue
+		Print "dir---"+dir
+		toolsDir=dir
+		
+		maxver=f
+		
 	Next
 
 	Local incsDir:=FindMaxVerDir( wkits+"\Include" )
