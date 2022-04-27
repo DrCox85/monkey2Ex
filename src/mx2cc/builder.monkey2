@@ -869,7 +869,7 @@ Class BuilderInstance
 
 		For Local i:=1 Until 10
 			Local file:="tmp/"+kind+i+".txt"
-			DeleteFile( file )
+			DeleteFile( file ) 
 			If GetFileType( file )=FileType.None Return file
 		Next
 		

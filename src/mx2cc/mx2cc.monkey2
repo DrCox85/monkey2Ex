@@ -426,6 +426,7 @@ Function ParseOpts:String[]( opts:BuildOpts,args:String[] )
 			Case "-quiet"
 				opts.verbose=-1
 			Case "-verbose"
+				Print "Verbose Mode:1"
 				opts.verbose=1
 			Case "-time"
 				opts_time=True
@@ -465,6 +466,7 @@ Function ParseOpts:String[]( opts:BuildOpts,args:String[] )
 		Case "-verbose"
 			Select val
 			Case "0","1","2","3","-1"
+				Print "Verbose Mode:"+val
 				opts.verbose=Int( val )
 			Default
 				Fail( "Invalid value for 'verbose' option: '"+val+"' - must be '0', '1', '2', '3' or '-1'" )

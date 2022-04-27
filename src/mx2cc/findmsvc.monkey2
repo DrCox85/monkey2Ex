@@ -5,9 +5,31 @@ Namespace mx2cc
 
 Function FindMSVC:Bool()
 
-	'Local msvcs:=GetEnv( "ProgramFiles" )+"\Microsoft Visual Studio\2022"
-	Local msvcs:="D:\VisualStudio\VC\Tools\MSVC"
+	'---findmsvc new----------
+		Local msvcs:String
+		If GetFileType(AppDir()+"vspath.txt")=FileType.File Then
+		
+			Local _file2:=FileStream.Open(AppDir()+"vspath.txt","r")
+			While Not _file2.Eof
+				msvcs=_file2.ReadLine()
+			Wend
+			_file2.Close()
+		Else
+			Local pathVsWhere:=GetEnv("ProgramFiles(x86)")+"\Microsoft Visual Studio\Installer\vswhere.exe"
+			If GetFileType(pathVsWhere)<>FileType.File Then Print "No Visual Studio installation found";Return False
+			Local VsWhereCmd:="~q"+pathVsWhere+"~q -property installationPath >~q"+AppDir()+"vspath.txt~q"
+			Local _file:FileStream
+			_file=FileStream.Open(AppDir()+"vsPath.bat","w")
+			_file.WriteLine("@echo off")
+			_file.WriteLine(VsWhereCmd)
+			_file.Close()
+			OpenUrl(AppDir()+"vsPath.bat")
+			Sleep(2)
+			DeleteFile(AppDir()+"vsPath.bat")
+		End		
+	'--------------------------end
 	If GetFileType( msvcs )<>FileType.Directory Return False
+	msvcs+="\VC\Tools\MSVC"
 	
 	Local wkits:=GetEnv( "ProgramFiles(x86)" )+"\Windows Kits\10"
 	If GetFileType( wkits )<>FileType.Directory Return False
@@ -19,7 +41,7 @@ Function FindMSVC:Bool()
 		Local dir:=msvcs+"\"+f
 		
 		If GetFileType( dir )<>FileType.Directory Continue
-		Print "dir---"+dir
+		
 		toolsDir=dir
 		
 		maxver=f
