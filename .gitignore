@@ -70,3 +70,4 @@ bin/mx2cc_windows.exe
 bin/env_windows.txt
 devtools.7z
 bin/mx2cc_windows.exe
+*.exe
