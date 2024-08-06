@@ -176,7 +176,7 @@ Class PrefsDialog Extends DialogExt
 		_mainPlaceDocsAtBegin=New CheckButton( "Place opened document to the left side" )
 		_mainPlaceDocsAtBegin.Checked=Prefs.MainPlaceDocsAtBegin
 		
-		_mainUseOpenGlEsProfile=New CheckButton( "Use opengl 'es' mode; uncheck to use full onengl (restart required)" )
+		_mainUseOpenGlEsProfile=New CheckButton( "Use opengl 'es' mode; uncheck to use full opengl (restart required)" )
 		_mainUseOpenGlEsProfile.Checked=(Prefs.OpenGlProfile="es")
 		
 		_monkeyRootPath=New TextFieldExt( Prefs.MonkeyRootPath )

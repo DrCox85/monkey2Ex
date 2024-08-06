@@ -43,7 +43,7 @@ Class PrefsInstance
 	'
 	Field MonkeyRootPath:String
 	Field IdeHomeDir:String
-	Field OpenGlProfile:="es"
+	Field OpenGlProfile:="core"
 	'
 	Field SiblyMode:Bool
 	

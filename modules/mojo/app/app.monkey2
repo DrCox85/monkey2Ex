@@ -145,7 +145,7 @@ Class AppInstance
 #If __TARGET__="macos" Or __TARGET__="linux"
 			gl_profile=SDL_GL_CONTEXT_PROFILE_COMPATIBILITY	'no gles20 on macos...
 #Else
-			gl_profile=SDL_GL_CONTEXT_PROFILE_ES
+			gl_profile=SDL_GL_CONTEXT_PROFILE_COMPATIBILITY
 #Endif
 		End
 

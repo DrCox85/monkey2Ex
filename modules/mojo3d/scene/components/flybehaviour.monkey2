@@ -87,7 +87,12 @@ Class FlyBehaviour Extends Behaviour
 	
 End
 
-Class EditorBehavoir Extends Behaviour
+Class EditorBehavior Extends Behaviour
+	
+	Global lastMouseX		:Float
+	Global lastMouseY		:Float
+	Global  _speed			:Float	=0.1
+	Global _rspeed			:Float	=0.3
 	
 	Method New( entity:Entity )
 		
@@ -128,16 +133,28 @@ Class EditorBehavoir Extends Behaviour
 	
 	Method OnUpdate( elapsed:Float ) Override
 		
-		Local rspeed:=_rspeed * 60.0 * elapsed
+		Local rspeed:Float=_rspeed 
 		
 		Local entity:=Entity
 		
 		Local view:=App.ActiveWindow
 		
+		Mouse.PointerVisible=True
 		If Mouse.ButtonDown( MouseButton.Right)
-			entity.RotateY( -rspeed*Mouse.XSpeed,True )
-			entity.RotateX( -rspeed*Mouse.YSpeed )
+'		
+			Local mx:Float=Mouse.X
+			Local my:Float=Mouse.Y
+			Mouse.Location = New Vec2i( App.ActiveWindow.Width/2, App.ActiveWindow.Height/2 )
+			Mouse.PointerVisible=False
+			Local deltaX:Float=mx-lastMouseX
+			Local deltaY:Float=my-lastMouseY
+			entity.RotateY(-deltaX*0.2,True)
+			entity.RotateX(deltaY*0.2,False)
 		Endif
+		
+		lastMouseX=Mouse.X
+		lastMouseY=Mouse.Y
+		entity.RotateZ(0)
 		
 		If Keyboard.KeyDown( Key.Up )
 			entity.RotateX( rspeed )
@@ -175,11 +192,6 @@ Class EditorBehavoir Extends Behaviour
 #endif
 		
 	End
-	
-	Private
-	
-	Field _speed:Float=.1
-	Field _rspeed:Float=3.0
 	
 End
 
