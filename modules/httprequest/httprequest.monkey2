@@ -34,6 +34,14 @@ Enum ReadyState
 	Error=5
 End
 
+Enum ProgressBar
+	None=0
+	Standard=1
+	Block=2
+	Giga=3
+End
+
+
 Class HttpRequestBase
 	
 	Field ReadyStateChanged:Void()
@@ -55,6 +63,14 @@ Class HttpRequestBase
 	Property ResponseText:String()
 		
 		Return _response
+	End
+	
+	Property ResponseData:DataBuffer()
+		Return _responseData
+	End
+	
+	Property PercentDownload:Int()
+		Return _percentDownload
 	End
 	
 	Property Status:Int()
@@ -87,6 +103,8 @@ Class HttpRequestBase
 	Field _readyState:ReadyState
 	Field _timeout:Float=60.0
 	Field _response:String
+	Field _responseData:DataBuffer
+	Field _percentDownload:Int
 	Field _status:Int=-1
 	Field _req:String
 	Field _url:String

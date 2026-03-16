@@ -13,29 +13,35 @@ Using httprequest..
 
 Class MyWindow Extends Window
 	
+	Global req:HttpRequest
+	
 	Method New( title:String="HttpRequest demo",width:Int=640,height:Int=480,flags:WindowFlags=Null )
 
 		Super.New( title,width,height,flags )
-
-		Layout="letterbox"		
 		
+		Layout="letterbox"		
+					
 		Local label:=New Label
 		
-		Local req:=New HttpRequest
+		req=New HttpRequest
 		
 		req.Timeout=10
-
+		
 		req.ReadyStateChanged=Lambda()
 		
 			label.Text="Ready state changed to "+Int( req.ReadyState )+" status="+req.Status
 			
-			If req.ReadyState=ReadyState.Done Print "Request response:~n"+req.ResponseText
+			If req.ReadyState=ReadyState.Done 
+				Print "Request response:~n"+req.ResponseText
+				Print "DATASIZE:"+req.ResponseData.Length
+				Print "Percent:"+req.PercentDownload
+			End
 		End
-		
+	
 	#If __TARGET__="emscripten"
 		Const url:="test.txt"
 	#else
-		Const url:="https://www.github.com"
+		Const url:="https://www.sunty-entertainment.de/downloads/client.dat"
 	#endif
 		
 		req.Open( "GET",url )
@@ -59,7 +65,7 @@ Class MyWindow Extends Window
 	End
 	
 	Method OnRender( canvas:Canvas ) Override
-	
+		Print req.PercentDownload
 		App.RequestRender()	'need this for ios?
 	End
 	
