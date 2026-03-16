@@ -16,7 +16,20 @@ struct bbProcess::Rep{
 			rep->release();
 		}
 	};
-
+	
+	//STDERR ERWEITERUNG
+	struct StderrEvent : public bbAsync::Event{
+		Rep *rep;
+		int avail;
+		bbFunction<void()> func;
+		void dispatch(){
+			int n=avail;
+			rep->stderrAvail=n;
+			func();
+			if ( !n ) rep->release();
+		}
+	};
+	//-----------------------------------------------------
 	struct StdoutEvent : public bbAsync::Event{
 		Rep *rep;
 		int avail;
@@ -37,9 +50,18 @@ struct bbProcess::Rep{
 	bool exited=false;
 	int exit=-1;
 	
+	//STDERR ERWEITERUNG
+	bbAsync::Semaphore stderrSema;
+	char stderrBuf[4096];
+	char *stderrGet;
+	int stderrAvail=0;
+	
+	//-----------------------------------------------------
+	
 	FinishedEvent finishedEvent;
 	StdoutEvent stdoutEvent;
-
+	StderrEvent stderrEvent;
+	
 #if _WIN32
 
 	HANDLE proc;
@@ -101,7 +123,10 @@ bbProcess::~bbProcess(){
 	
 	_rep->finishedEvent.func={};
 	_rep->stdoutEvent.func={};
+	_rep->stderrEvent.func={};
 	_rep->release();
+	
+	
 }
 
 bbBool bbProcess::start( bbString cmd ){
@@ -271,10 +296,84 @@ bbBool bbProcess::start( bbString cmd ){
 
 	} ).detach();
 	
+	//Create stderrReady thread_local
+	//
+	rep->retain();
+	rep->stderrEvent.rep=rep;
+	rep->stderrEvent.avail=-1;
+	rep->stderrEvent.func=stderrReady;
+
+	std::thread( [=](){
+
+		for(;;){
+
+#if _WIN32
+			DWORD n=0;
+			if( !ReadFile( rep->err,rep->stderrBuf,4096,&n,0 ) ) break;
+			if( n<=0 ) break;
+#else
+			int n=read( rep->err,rep->stderrBuf,4096 );
+			if( n<=0 ) break;
+#endif
+			rep->stderrGet=rep->stderrBuf;
+
+			rep->stderrEvent.avail=(int)n;
+
+			rep->stderrEvent.post();
+
+			rep->stderrSema.wait();
+
+			if( rep->stderrAvail ) break;
+		}
+
+		rep->stderrEvent.avail=0;
+		rep->stderrEvent.post();
+
+	} ).detach();
+	
 	_rep=rep;
     
     return true;
 }
+//STDERR ERWEITERUNG
+bbInt bbProcess::stderrAvail(){
+
+	if( !_rep ) return 0;
+
+	return _rep->stderrAvail;
+}
+
+bbString bbProcess::readStderr(){
+
+	if( !_rep || !_rep->stderrAvail ) return "";
+
+	bbString str=bbString::fromCString( _rep->stderrGet,_rep->stderrAvail );
+
+	_rep->stderrAvail=0;
+
+	_rep->stderrSema.signal();
+
+	return str;
+}
+
+bbInt bbProcess::readStderr( void *buf,int count ){
+
+	if( !_rep || count<=0 || !_rep->stderrAvail ) return 0;
+
+	if( count>_rep->stderrAvail ) count=_rep->stderrAvail;
+
+	memcpy( buf,_rep->stderrGet,count );
+
+	_rep->stderrGet+=count;
+
+	_rep->stderrAvail-=count;
+
+	if( !_rep->stderrAvail ) _rep->stderrSema.signal();
+
+	return count;
+}
+
+//_________________________________________________________________________________________
 
 bbInt bbProcess::stdoutAvail(){
 
@@ -346,6 +445,7 @@ void bbProcess::terminate(){
 #if _WIN32
 	bbProcUtil::TerminateProcessGroup( _rep->proc,-1 );
 	CancelIoEx( _rep->out,0 );
+	CancelIoEx( _rep->err,0 );
 #else
 	killpg( _rep->proc,SIGTERM );
 #endif
@@ -373,9 +473,11 @@ void bbProcess::gcMark(){
 
 	bbGCMark( finished );
 	bbGCMark( stdoutReady );
+	bbGCMark( stderrReady );
 	
 	if( _rep ){
 		bbGCMark( _rep->finishedEvent.func );
 		bbGCMark( _rep->stdoutEvent.func );
+		bbGCMark( _rep->stderrEvent.func );
 	}
 }

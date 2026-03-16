@@ -14,7 +14,7 @@ Function Main()
 	
 	Local clsname:="MyWindowClass"
 	
-	Local wndclass:WNDCLASSWx
+	Local wndclass:WNDCLASSW
 	wndclass.style=0
 	wndclass.lpfnWndProc=MyWndProc
 	wndclass.hInstance=GetModuleHandleW( Null )

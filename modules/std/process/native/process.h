@@ -15,16 +15,20 @@ public:
 	bbFunction<void()> finished;
 
 	bbFunction<void()> stdoutReady;
+	bbFunction<void()> stderrReady;//
 	
 	bbBool start( bbString cmd );
 	
 	bbInt exitCode();
 	
 	bbInt stdoutAvail();
+	bbInt stderrAvail();//
 	
 	bbString readStdout();
+	bbString readStderr();//
 	
 	bbInt readStdout( void *buf,bbInt count );
+	bbInt readStderr( void *buf,bbInt count );//
 	
 	bbInt writeStdin( bbString str );
 	
